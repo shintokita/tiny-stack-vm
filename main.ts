@@ -13,6 +13,9 @@ PS[1] = PS[2] = 1; PS[0x52] = 1;
 PP[0x31] = 1; PP[0x32] = 1;
 PP[0x40] = 1; PS[0x40] = 1; PP[0x41] = 2;
 PP[0x50] = 1; PP[0x51] = 1; PP[0x53] = 1;
+const VALID = new Uint8Array(256);
+for (const o of [0, 1, 2, 3, 4, 5, 6, 7, 0x30, 0x31, 0x32, 0x33, 0x34, 0x40, 0x41, 0x50, 0x51, 0x52, 0x53]) VALID[o] = 1;
+for (let i = 0x10; i <= 0x22; i++) if (i !== 0x1f) VALID[i] = 1;
 
 function run(p: Uint8Array, inp: Uint8Array): { out: Uint8Array; code: number } {
   const n = p.length;
@@ -24,8 +27,7 @@ function run(p: Uint8Array, inp: Uint8Array): { out: Uint8Array; code: number } 
     if (st === 1000000) return done(10);
     if (pc < 0 || pc >= n) return done(9);
     const op = p[pc];
-    const ok = op <= 7 || (op >= 0x10 && op <= 0x22 && op !== 0x1f) || (op >= 0x30 && op <= 0x34) || (op >= 0x40 && op <= 0x41) || (op >= 0x50 && op <= 0x53);
-    if (!ok) return done(5);
+    if (!VALID[op]) return done(5);
     const imm = IM[op];
     if (pc + imm >= n) return done(9);
     st++;
